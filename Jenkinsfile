@@ -22,7 +22,8 @@ node {
             sh 'curl 127.0.0.1:8082'
             sh 'docker ps'
             sh """
-                if [ \$(docker ps -q -f name=run-$BUILD_ID) ]; then
+                CONTAINER_ID=\$(docker ps -q -f name=run-$BUILD_ID)
+                if [ -n "\$CONTAINER_ID" ]; then
                     docker stop run-$BUILD_ID
                     docker rm run-$BUILD_ID
                 fi
