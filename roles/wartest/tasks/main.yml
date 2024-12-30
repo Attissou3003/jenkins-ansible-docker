@@ -1,18 +1,38 @@
-- name: install pip
-  apt:
-    name: python-pip
-    state: present
+---
+- name: Install dependencies and run Docker container
+  hosts: all
+  become: true
+    # Ensure python3 and pip3 are installed
+    - name: Ensure python3 and pip3 are installed
+      package:
+        name:
+          - python3
+          - python3-pip
+        state: present
 
-- name: pip install docker-py
-  pip:
-    name:
-      - docker
-      - docker-compose
+    # Install docker-py using pip3
+    - name: Install docker-py with pip3
+      pip:
+        name: docker-py
+        executable: pip3
 
-- name: run container
-  docker_container:
-    name: wartest
-    image: "{{ image }}"
-    ports: 8082:8080
-    state: started
+    # Install docker and docker-compose using pip3
+    - name: Install docker and docker-compose
+      pip:
+        name:
+          - docker
+          - docker-compose
+        executable: pip3
+
+    # Run Docker container from the image
+    - name: Run Docker container
+      docker_container:
+        name: wartest
+        image: "{{ image }}"
+        ports:
+          - "8082:8080"
+        state: started
+
+
+
  
