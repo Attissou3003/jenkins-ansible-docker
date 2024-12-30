@@ -11,12 +11,22 @@ node {
           docker.build("$IMAGE",  '.')
     }
     stage('Build - Test') {
-            img.withRun("--name run-$BUILD_ID -p 8081:8080") { c ->
+            img.withRun("--name run-$BUILD_ID -p 8082:8080") { c ->
+            sh """ 
+                docker ps -a -q --filter name=run-$BUILD_ID | xargs -r docker rm -f
+            """
+            sh "docker run -d --name run-$BUILD_ID -p 8082:8080 $IMAGE"
             sh 'docker ps'
             sh 'netstat -ntaup'
             sh 'sleep 30s'
-            sh 'curl 127.0.0.1:8081'
+            sh 'curl 127.0.0.1:8082'
             sh 'docker ps'
+            sh """
+                if [ \$(docker ps -q -f name=run-$BUILD_ID) ]; then
+                    docker stop run-$BUILD_ID
+                    docker rm run-$BUILD_ID
+                fi
+            """
           }
     }
     stage('Build - Push') {
