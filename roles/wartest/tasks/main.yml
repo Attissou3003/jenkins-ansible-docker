@@ -2,29 +2,25 @@
 - name: Install dependencies and run Docker container
   hosts: all
   become: true
-    # Ensure python3 and pip3 are installed
+  tasks:
     - name: Ensure python3 and pip3 are installed
       package:
         name:
           - python3
           - python3-pip
         state: present
-
-    # Install docker-py using pip3
     - name: Install docker-py with pip3
       pip:
         name: docker-py
         executable: pip3
-
-    # Install docker and docker-compose using pip3
-    - name: Install docker and docker-compose
-      pip:
+    - name: Install Docker and Docker Compose (using apt for Ubuntu/Debian)
+      apt:
         name:
-          - docker
+          - docker.io
           - docker-compose
-        executable: pip3
+        state: present
+        update_cache: yes
 
-    # Run Docker container from the image
     - name: Run Docker container
       docker_container:
         name: wartest
@@ -32,7 +28,3 @@
         ports:
           - "8082:8080"
         state: started
-
-
-
- 
